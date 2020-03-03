@@ -1,51 +1,82 @@
 <template>
-    <ul  class="list">
-        <li class="item" 
-        v-for="(item,key) of cities" 
-        :key="key" 
-        @click="handleLetterClick"
-        >
-            {{key}}
-        </li>
+  <div>
+    <ul class="list">
+      <li class="item" v-for="item in letters" :key="item"
+          @click="handleLetterClick"
+          @touchstart.prevent="handleTouchStart"
+          :ref = 'item'
+          @touchmove="handleTouchMove"
+          @touchend="handleTouchEnd"
+      >{{item}}</li>
     </ul>
-    
+  </div>
 </template>
 
 <script>
 export default {
-    name:'CityAlphabet',
-    props: {
-        cities:Object
-    },
-    methods: {
-        handleLetterClick (e) {
-            this.$emit('change', e.target.innerText)   //通过$emit向父组件传递数据 父组件再监听该事件
-            // console.log(e.target.innerText)
-        }
+  name: 'CityAlphabet',
+  props: ['cities'],
+  data () {
+    return {
+      touchStatus: false,
+      startY: 0,
+      timer: null
     }
+  },
+  computed: {
+    letters () {
+      const letters = []
+      for (let i in this.cities) {
+        letters.push(i)
+      }
+      return letters
+    }
+  },
+  updated () {
+    this.startY = this.$refs['A'][0].offsetTop
+  },
+  methods: {
+    // 兄弟组件如何传值
+    handleLetterClick (e) {
+      this.$emit('change', e.target.innerHTML)
+    },
+    handleTouchStart () {
+      this.touchStatus = true
+    },
+    handleTouchMove (e) {
+      if (this.touchStatus) {
+        if (this.timer) {
+          clearTimeout(this.time)
+        }
+        this.timer = setTimeout(() => {
+          const touchY = e.touches[0].clientY - 79
+          const index = Math.floor(touchY - this.startY) / 20
+          if (index >= 0 && index < this.letters.length) {
+            this.$emit('change', this.letters[index])
+          }
+        }, 16)
+      }
+    },
+    handleTouchEnd () {
+      this.touchStatus = false
+    }
+  }
 }
 </script>
 
 <style lang="stylus" scoped>
-.list{
-    display flex;
-    flex-direction column;
-    justify-content center;
-    position fixed;
-    top 1.88rem;
-    right 0;
-    bottom 0;
-    width: .3rem;
-    text-transform: uppercase;
-    z-index:99;
-    
-}
-.item {
-    line-height: 0.4rem;
-    text-align: center;
-     color: #555;
-     font-size 0.23rem;
-}
+  @import "~styles/varibles.styl"
+  .list
+    position absolute
+    right 0
+    top 1.58rem
+    bottom 0
+    display flex
+    width .4rem
+    flex-direction column
+    justify-content center
+    .item
+      text-align center
+      line-height .4rem
+      color $bgColor
 </style>
-
-

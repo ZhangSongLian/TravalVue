@@ -1,103 +1,101 @@
 <template>
-    <div class="list" ref="wrapper">
-        <div>
-        <div class="area">
-            <div class="title">当前城市</div>
-            <div class="button-list">
-                <div class="button-wraper">
-                    <div class="button">北京</div>
-                </div>
-            </div>
+  <div class="list" ref="wrapper">
+    <div>
+      <div class="area">
+        <div class="title border-topbottom">当前城市</div>
+        <div class="button-list">
+          <div class="button-wrapper">
+            <div class="button" ref="mycity">{{this.current_city}}</div>
+          </div>
         </div>
-        <div class="area">
-            <div class="title">热门城市</div>
-            <div class="button-list">
-                <div class="button-wraper" v-for="item of hot" v-bind:key="item.id">
-                    <div class="button">{{item.name}}</div>
-                </div>
-            </div>
+      </div>
+      <div class="area">
+        <div class="title border-topbottom">热门城市</div>
+        <div class="button-list">
+          <div class="button-wrapper"  v-for="city in hotcities" :key="city.id">
+            <div class="button" @click="HandleCity(city.name)">{{city.name}}</div>
+          </div>
         </div>
-        <div class="area"
-         v-for="(item,key) of cities" 
-         :key="key"
-         :ref="key"
-         >
-            <div class="title">{{key}}</div>
-            <div class="item-list">
-                <div class="item" v-for="innerItem of item" :key="innerItem.id">{{innerItem.name}}</div>
-            </div>
+      </div>
+      <div class="area" v-for="(city,key) in cities" :key="key" :ref="key">
+        <div class="title border-topbottom">{{key}}</div>
+        <div class="item-list">
+          <div class="item border-bottom" v-for="c in city" :key="c.id" @click="HandleCity(c.name)">{{c.name}}</div>
         </div>
-        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 import BScroll from 'better-scroll'
+import {mapState, mapMutations} from 'vuex'
 export default {
-    name:'CityList',
-    props:{
-        hot:Array,
-        cities:Object,
-        letter:String
+  name: 'CityList',
+  mounted: function () {
+    this.scroll = new BScroll(this.$refs.wrapper)
+  },
+  props: ['cities', 'hotcities', 'letter'],
+  methods: {
+    HandleCity (value) {
+      // this.$store.commit('changeCity', value)
+      this.citychanged(value)
+      this.$router.push('/')
     },
-    mounted(){
-       this.scroll = new BScroll(this.$refs.wrapper)
-    },
-    watch: { //监听器  点击字母跳到相应的区域
-        letter () {
-            if(this.letter) {
-                const element = this.$refs[this.letter][0]
-                this.scroll.scrollToElement(element)
-            }
-            // console.log(this.letter)
-        }
+    ...mapMutations([
+      'citychanged'
+    ])
+  },
+  watch: {
+    letter () {
+      if (this.letter) {
+        const element = this.$refs[this.letter][0]
+        this.scroll.scrollToElement(element)
+      }
     }
+  },
+  computed: mapState({
+    current_city: 'city'
+  })
 }
 </script>
-
 <style lang="stylus" scoped>
-     @import '../../../assets/styles/varibles.styl';
-     .list {
-         overflow hidden;
-         position absolute;
-         top 1.78rem;
-         left 0;
-         right 0;
-         bottom 0;
-        
-     }
-     .title {
-         width 100%;
-         height 0.54rem;
-         line-height 0.54rem;
-         background-color: #f2f8fb;
-         border-bottom: 1px solid #d2d9df;
-         padding-left 0.2rem;
-         color #666;
-         font-size 0.26rem;
-     }
-     .button-list {
-        overflow hidden;
-        padding 0.1rem 0.6rem 0.1rem 0.1rem;
-     }
-     .button-wraper {
-        float left;
-        width 33.33%;
-     }
-     .button {
-         margin 0.1rem;
-         text-align center;
-         border:0.02rem solid #ccc;
-         padding  0.1rem 0;
-         border-radius 0.06rem;
-     }
-     
-     .item {
-         line-height 0.76rem;
-         color #666;
-         padding-left 0.2rem;
-         border-bottom: 0.01rem solid #d2d9df;
-     }
+  @import "~styles/varibles.styl"
+  .border-topbottom
+    &:before
+      border-color #ccc
+    &:after
+      border-color #ccc
+  .border-bottom
+  &:before
+    border-color #ccc
+  .list
+    overflow hidden
+    position absolute
+    top 1.58rem
+    right 0
+    bottom 0
+    left 0
+    .title
+      line-height .54rem
+      padding-left .2rem
+      background #eee
+      color #666
+      font-size .26rem
+    .button-list
+      padding .1rem .6rem .1rem .1rem
+      overflow hidden
+      .button-wrapper
+        float left
+        padding .1rem
+        .button
+          text-align center
+          margin .1rem
+          border .02rem solid #ccc
+          border-radius .06rem
+          padding .1rem .5rem
+    .item-list
+      .item
+        line-height .76rem
+        padding-left .2rem
 </style>
-
-

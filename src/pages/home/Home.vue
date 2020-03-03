@@ -1,63 +1,66 @@
 <template>
-    <div>
-         <!-- 父组件通过props方式向子组件传递数据 -->
-        <home-header :city="city"></home-header>
-        <home-swiper v-bind:list="swiperList"></home-swiper>
-        <home-icons  v-bind:list="iconList"></home-icons>
-        <home-recommend v-bind:recommendList="recommendList"></home-recommend>
-        <home-weekend></home-weekend>
+  <div>
+    <home-header></home-header>
+    <home-swiper :swiperList="swiperList"></home-swiper>
+    <home-icons :iconList="iconList"></home-icons>
+    <home-recommend :hotList="hotList"></home-recommend>
+    <home-weekend :weekendList="weekendList"></home-weekend>
     </div>
 </template>
 
 <script>
+// import ApiUrl from '@/config/api_url'
+import axios from 'axios'
 import HomeHeader from './components/Header'
 import HomeSwiper from './components/Swiper'
 import HomeIcons from './components/Icons'
 import HomeRecommend from './components/Recommend'
 import HomeWeekend from './components/Weekend'
-import axios from 'axios' 
-
+import { mapState } from 'vuex'
 
 export default {
-    name:"Home",
-    components: {
-        HomeHeader:HomeHeader,
-        HomeSwiper:HomeSwiper,
-        HomeIcons:HomeIcons,
-        HomeRecommend:HomeRecommend,
-        HomeWeekend:HomeWeekend
+  name: 'Home',
+  components: {HomeHeader, HomeSwiper, HomeIcons, HomeRecommend, HomeWeekend},
+  data () {
+    return {
+      swiperList: [],
+      iconList: [],
+      hotList: [],
+      weekendList: []
+    }
+  },
+  computed: mapState([
+    'city'
+  ]),
+  activated () { // 当页面重新被显示的时候会触发
+    // 当页面加载时，进行判断，城市发生了改变
+    if (this.LastCity !== this.city) {
+      this.getHomeInfo()
+      this.LastCity = this.city
+    }
+  },
+  methods: {
+    getHomeInfo () {
+      axios.get('/api/index.json', {params: {city: this.city}})
+        .then(this.handleIndex)
     },
-    data (){
-        return {
-            city:"",
-            swiperList:[],
-            iconList:[],
-            recommendList:[]
-        }
-    },
-    methods: {
-        getHomeInfo () {
-           axios.get('/api/index.json')
-                .then(this.getHomeInfoSucc)
-        },
-        getHomeInfoSucc (res) {
-            res = res.data
-             if (res.ret && res) {
-                 this.city = res.city
-                 this.swiperList = res.swiperList
-                 this.iconList = res.iconList
-                 this.recommendList = res.recommendList
-             }
-        }
-    },
-    // mounted 编译好的html挂载到页面完成后执行的事件钩子，此钩子函数中一般会做一些ajax请求获取数据进行数据初始化
-    mounted () {
-        this.getHomeInfo ()
-    },
+    handleIndex (res) {
+      res = res.data
+      if (res.ret && res.data) {
+        this.swiperList = res.data.swiperList
+        this.iconList = res.data.iconList
+        this.hotList = res.data.hotList
+        this.weekendList = res.data.weekendList
+      }
+    }
+  },
+  mounted () {
+    this.getHomeInfo()
+    this.LastCity = this.city
+  }
 }
 </script>
 
 <style>
 
 </style>
-

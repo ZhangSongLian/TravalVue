@@ -1,40 +1,36 @@
 <template>
-  <div>
-    <div class='header'>
-      城市选择
-      <!-- 跳回到首页 -->
-      <router-link to="/">
-        <div class="go-back iconfont">
-          &#xe624;
-        </div>
-      </router-link>
+  <div class="header">
+    <router-link to="/">
+      <div class="header-left">
+        <div class="iconfont back-icon">&#xe606;</div>
       </div>
+    </router-link>
+    选择城市
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'CityHeader'
-  }
+export default {
+  name: 'CityHeader'
+}
 </script>
-
 <style lang="stylus" scoped>
- @import '~styles/varibles.styl';
-  .header{
-    height 0.86rem;
-    line-height 0.86rem;
-    text-align center;
-    color #fff;
-    background $bgColor;
-    position relative;
-  }
-  .go-back {
-    width 0.64rem;
-    text-align center;
-    font-size .35rem;
-    color #fff;
-    position absolute;
-    left 0;
-    top 0;
-  }
+  @import "~styles/varibles.styl"
+  .header
+    position relative
+    overflow hidden
+    height $headerHeight
+    line-height $headerHeight
+    color #ffffff
+    background $bgColor
+    text-align center
+    font-size .32rem
+    .header-left
+      color #ffffff
+      top 0
+      left: 0
+      font-size .4rem
+      width .64rem
+      position absolute
+      text-align center
 </style>

@@ -1,60 +1,54 @@
 <template>
-    <div>
-        <city-header></city-header>
-        <city-search :cities="cities"></city-search>
-       <city-list :cities="cities" :hot="hotCities" :letter="letter"></city-list>  <!-- 城市列表 -->
-        <city-alphabet :cities="cities" @change="handleLetterChange"></city-alphabet>
-    </div>
+  <div>
+    <city-header></city-header>
+    <city-search :cities="cities"></city-search>
+    <city-list :cities="cities" :hotcities="hotCities" :letter="letter"></city-list>
+    <city-alphabet :cities="cities" @change="handleLetterChange"></city-alphabet>
+  </div>
 </template>
 
 <script>
-
-import axios from 'axios' 
+import ApiUrl from '@/config/api_url'
+import axios from 'axios'
 import CityHeader from './components/Header'
 import CitySearch from './components/Search'
 import CityList from './components/List'
 import CityAlphabet from './components/Alphabet'
 
-
 export default {
-    name:'City',
-    components: {
-        CityHeader:CityHeader,
-        CitySearch:CitySearch,
-        CityList:CityList,
-        CityAlphabet:CityAlphabet
+  name: 'City',
+  components: {
+    CityHeader, CitySearch, CityList, CityAlphabet
+  },
+  data () {
+    return {
+      cities: {},
+      hotCities: [],
+      letter: ''
+    }
+  },
+  methods: {
+    getCityInfo () {
+      axios.get(ApiUrl.api + 'city.json?city=')
+        .then(this.handleGetCityInfoSucc)
     },
-    data () {
-        return {
-            cities:{},
-            hotCities:[],
-            letter:""
-        }
+    handleGetCityInfoSucc (res) {
+      res = res.data
+      if (res.ret && res.data) {
+        this.cities = res.data.cities
+        this.hotCities = res.data.hotCities
+      }
     },
-     methods: {
-        getHomeInfo () {  //https://www.kancloud.cn/yunye/axios/234845
-           axios.get('/api/city.json')   //axios是一个基于promise的HTTP库，可以用在浏览器和node.js中
-                .then(this.getHomeInfoSucc)
-        },
-        getHomeInfoSucc (res) {
-           res = res.data
-           if(res.ret && res.data){
-             const data = res.data
-             this.cities = data.cities
-             this.hotCities = data.hotCities
-           }
-        },
-        handleLetterChange (letter) {
-            this.letter = letter
-            console.log(letter)
-        }
-    },
-    mounted () {
-        this.getHomeInfo ()
-    },
+    handleLetterChange (letter) {
+      this.letter = letter
+    }
+  },
+  mounted () {
+    this.getCityInfo()
+  }
 }
 </script>
 
-<style>
+<style lang="stylus" scoped>
 
 </style>
